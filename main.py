@@ -9,6 +9,7 @@ from reserva import Reserva
 
 
 
+
 # Solicitamos los datos del cliente y controlamos posibles errores de validación.
 try:
     nombre = input("Ingrese el nombre del cliente: ")
@@ -28,22 +29,37 @@ try:
     
     reserva_nueva= Reserva(cliente_nuevo, nombre_del_servicio, fecha_reserva, hora_reserva)
 
-    print(cliente_nuevo.nombre)
-    print(cliente_nuevo.obtener_numero_identificacion())
-
-    print(reserva_nueva.codigo_reserva)
-    print(reserva_nueva.estado)
-    print(reserva_nueva.confirmar_reserva())
-    print(reserva_nueva.estado)
-    print(reserva_nueva.cancelar_reserva())
-    print(reserva_nueva.estado)
-    print(reserva_nueva.cancelar_reserva())
-    print(reserva_nueva.estado)
+    # print(cliente_nuevo.nombre)
+    # print(cliente_nuevo.obtener_numero_identificacion())
+    # print(reserva_nueva.codigo_reserva)
+    # print(reserva_nueva.estado)
+    # print(reserva_nueva.confirmar_reserva())
+    # print(reserva_nueva.estado)
+    # print(reserva_nueva.cancelar_reserva())
+    # print(reserva_nueva.estado)
+    # print(reserva_nueva.cancelar_reserva())
+    # print(reserva_nueva.estado)
+    
+    opcion=input("""seleccione una opción: 
+    1. Confirmar reserva
+    2. Cancelar reserva
+    3. Dejar pendiente
+    """)
+    
+    if opcion=="1":
+        print(reserva_nueva.confirmar_reserva())
+        logging.info(f"Reserva {reserva_nueva.codigo_reserva} confirmada.")
+    elif opcion=="2":
+        print(reserva_nueva.cancelar_reserva())
+        logging.info(f"Reserva {reserva_nueva.codigo_reserva} cancelada.")
+    elif opcion=="3":
+        print(f"Reserva {reserva_nueva.codigo_reserva} permanece pendiente.")
+        logging.info(f"Reserva {reserva_nueva.codigo_reserva} permanece pendiente.")
+    else:
+        print("Opción no válida. La reserva permanecerá pendiente.")    
+    
 # Mostramos un mensaje y registramos el error si algún dato no es válido.    
 except (DatoInvalidoError, ReservaInvalidaError, OperacionNoPermitidaError) as error:
     print(f"Error: {error}")
-    logging.error(f"Error al crear el cliente: {error}")    
-    
-    
-    
+    logging.exception(f"Error en la creación o gestión de la reserva: {error}") 
     

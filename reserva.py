@@ -1,6 +1,6 @@
 from excepciones import ReservaInvalidaError 
 from excepciones import OperacionNoPermitidaError
-
+from datetime import datetime,date
 
 class Reserva:
     contador = 0  # Contador de reservas
@@ -12,6 +12,23 @@ class Reserva:
             raise ReservaInvalidaError("La fecha de la reserva no puede estar vacía.")
         if hora.strip() == "":
             raise ReservaInvalidaError("La hora de la reserva no puede estar vacía.")
+        
+        try:
+            fecha_reserva = datetime.strptime(fecha, "%Y-%m-%d").date()
+            if fecha_reserva < date.today():
+                raise ReservaInvalidaError("La fecha de la reserva no puede ser anterior a la fecha actual.")   
+        except ValueError as error:
+            raise ReservaInvalidaError("Formato de fecha inválido. Use YYYY-MM-DD.") from error
+        try:
+            hora_reserva = datetime.strptime(hora, "%H:%M").time()
+        except ValueError as error:
+            raise ReservaInvalidaError("Formato de hora inválido. Use HH:MM.") from error
+        
+        fecha_hora_reserva = datetime.combine(fecha_reserva, hora_reserva)
+      
+        if fecha_hora_reserva < datetime.now():
+            raise ReservaInvalidaError("La fecha y hora de la reserva no pueden ser anteriores a la fecha y hora actuales.")
+            
         self.cliente = cliente
         self.servicio = servicio
         self.fecha = fecha
