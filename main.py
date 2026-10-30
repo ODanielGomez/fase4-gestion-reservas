@@ -39,24 +39,27 @@ try:
     # print(reserva_nueva.estado)
     # print(reserva_nueva.cancelar_reserva())
     # print(reserva_nueva.estado)
-    
-    opcion=input("""seleccione una opción: 
-    1. Confirmar reserva
-    2. Cancelar reserva
-    3. Dejar pendiente
-    """)
-    
-    if opcion=="1":
-        print(reserva_nueva.confirmar_reserva())
-        logging.info(f"Reserva {reserva_nueva.codigo_reserva} confirmada.")
-    elif opcion=="2":
-        print(reserva_nueva.cancelar_reserva())
-        logging.info(f"Reserva {reserva_nueva.codigo_reserva} cancelada.")
-    elif opcion=="3":
-        print(f"Reserva {reserva_nueva.codigo_reserva} permanece pendiente.")
-        logging.info(f"Reserva {reserva_nueva.codigo_reserva} permanece pendiente.")
-    else:
-        print("Opción no válida. La reserva permanecerá pendiente.")    
+    while True:
+        opcion=input("""seleccione una opción: 
+        1. Confirmar reserva
+        2. Cancelar reserva
+        3. Dejar pendiente
+        """)
+        
+        if opcion=="1":
+            print(reserva_nueva.confirmar_reserva())
+            logging.info(f"Reserva {reserva_nueva.codigo_reserva} confirmada.")
+            break
+        elif opcion=="2":
+            print(reserva_nueva.cancelar_reserva())
+            logging.info(f"Reserva {reserva_nueva.codigo_reserva} cancelada.")
+            break
+        elif opcion=="3":
+            print(f"Reserva {reserva_nueva.codigo_reserva} permanece pendiente.")
+            logging.info(f"Reserva {reserva_nueva.codigo_reserva} permanece pendiente.")
+            break
+        else:
+            print("Opción no válida. Intenta Nuevamente.")    
     
 # Mostramos un mensaje y registramos el error si algún dato no es válido.    
 except (DatoInvalidoError, ReservaInvalidaError, OperacionNoPermitidaError) as error:
