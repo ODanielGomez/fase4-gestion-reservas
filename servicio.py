@@ -148,3 +148,106 @@ class AsesoriaEspecializada(Servicio):
 
     def calcular_costo_base(self):
         return self.tarifa_base
+
+
+class SalaCorporativa(ReservaSala):
+    """Sala del catálogo que además guarda su capacidad y descripción."""
+
+    def __init__(
+        self,
+        nombre,
+        capacidad,
+        descripcion,
+        tarifa_base,
+        horas=1,
+        impuesto=0,
+        descuento=0,
+        disponible=True,
+    ):
+        self.__capacidad = self._validar_capacidad(capacidad)
+        self.__descripcion = self._validar_descripcion(descripcion)
+        super().__init__(nombre, tarifa_base, horas, impuesto, descuento, disponible)
+
+    @property
+    def capacidad(self):
+        return self.__capacidad
+
+    @property
+    def descripcion(self):
+        return self.__descripcion
+
+    @staticmethod
+    def _validar_capacidad(capacidad):
+        if (
+            isinstance(capacidad, bool)
+            or not isinstance(capacidad, int)
+            or capacidad <= 0
+        ):
+            raise DatoInvalidoError(
+                "La capacidad de la sala debe ser un número entero mayor que cero."
+            )
+        return capacidad
+
+    @staticmethod
+    def _validar_descripcion(descripcion):
+        if not isinstance(descripcion, str) or descripcion.strip() == "":
+            raise DatoInvalidoError("La descripción de la sala no puede estar vacía.")
+        return descripcion.strip()
+
+
+class ComboEquipos(Servicio):
+    """Combo cerrado de equipos con una tarifa fija por jornada de ocho horas."""
+
+    JORNADA_HORAS = 8
+
+    def __init__(
+        self,
+        nombre,
+        tarifa_base,
+        componentes,
+        impuesto=0,
+        descuento=0,
+        disponible=True,
+    ):
+        super().__init__(nombre, tarifa_base, impuesto, descuento, disponible)
+        self.__componentes = self._validar_componentes(componentes)
+
+    @property
+    def componentes(self):
+        """Devuelve una copia de los equipos y sus cantidades."""
+        return dict(self.__componentes)
+
+    @property
+    def jornada_horas(self):
+        return self.JORNADA_HORAS
+
+    @property
+    def horas(self):
+        """Permite consultar la jornada desde la reserva."""
+        return self.JORNADA_HORAS
+
+    @staticmethod
+    def _validar_componentes(componentes):
+        if not isinstance(componentes, dict) or not componentes:
+            raise DatoInvalidoError("El combo debe incluir al menos un equipo.")
+
+        componentes_validos = {}
+        for nombre, cantidad in componentes.items():
+            if not isinstance(nombre, str) or nombre.strip() == "":
+                raise DatoInvalidoError(
+                    "El nombre de cada equipo debe ser un texto válido."
+                )
+            if (
+                isinstance(cantidad, bool)
+                or not isinstance(cantidad, int)
+                or cantidad <= 0
+            ):
+                raise DatoInvalidoError(
+                    "La cantidad de cada equipo debe ser un entero mayor que cero."
+                )
+            componentes_validos[nombre.strip()] = cantidad
+        return componentes_validos
+
+    def calcular_costo_base(self):
+        """El costo del combo es fijo y no se multiplica por sus equipos."""
+        return self.tarifa_base
