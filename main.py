@@ -20,6 +20,7 @@ from excepciones import (
     ServicioNoDisponibleError,
 )
 from reserva import Reserva
+from servicio import SalaCorporativa
 
 
 def formatear_pesos(valor):
@@ -226,8 +227,31 @@ def gestionar_reserva(reserva):
             print("Opción no válida. Intente nuevamente.")
 
 
+def validar_cruce_sala(reserva_nueva, reservas):
+    """Comprueba cruces entre reservas activas de una misma sala."""
+    if not isinstance(reserva_nueva.servicio, SalaCorporativa):
+        return
+
+    inicio_nuevo = reserva_nueva.fecha_hora_inicio
+    fin_nuevo = reserva_nueva.obtener_fecha_hora_final()
+
+    for existente in reservas:
+        if existente.estado == Reserva.ESTADO_CANCELADA:
+            continue
+        if not isinstance(existente.servicio, SalaCorporativa):
+            continue
+        if existente.servicio.nombre != reserva_nueva.servicio.nombre:
+            continue
+        if (inicio_nuevo < existente.obtener_fecha_hora_final()
+                and existente.fecha_hora_inicio < fin_nuevo):
+            raise ReservaInvalidaError(
+                f"La sala {reserva_nueva.servicio.nombre} ya tiene una reserva en ese horario."
+            )
+
+
 def registrar_reserva(reserva, reservas):
     """Guarda la reserva, muestra sus datos y permite gestionarla."""
+    validar_cruce_sala(reserva, reservas)
     reservas.append(reserva)
 
     print(f"\nReserva creada: {reserva.codigo_reserva}")
