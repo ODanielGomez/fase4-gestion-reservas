@@ -183,11 +183,9 @@ El archivo `pruebas.py` contiene comprobaciones manuales sobre la creación de
 clientes, el rechazo de fechas pasadas, la creación de reservas, los estados y
 la cancelación.
 
-En la versión revisada, este script no finaliza correctamente porque intenta
-crear una reserva con un servicio representado como texto, mientras que la
-clase `Reserva` exige una instancia de `Servicio`. Por este motivo, se conserva
-como referencia, pero la validación recomendada del sistema se realiza con las
-pruebas automatizadas.
+El archivo pruebas.py ejecuta diez comprobaciones sobre clientes y reservas,
+incluyendo datos válidos e inválidos, fechas pasadas y cambios de estado.
+Para crear las reservas utiliza una instancia de ReservaSala.
 
 ## Pruebas automatizadas individuales
 
@@ -245,6 +243,4 @@ python -m unittest discover -s pruebas -v
   con estos valores en cero.
 - **Reportes y consultas:** ampliar la gestión con filtros por cliente, fecha,
   servicio y estado de reserva.
-- **Actualización de las pruebas manuales:** ajustar `pruebas.py` para que use
-  una instancia real de `Servicio` y pueda ejecutarse correctamente con las
-  validaciones actuales.
+

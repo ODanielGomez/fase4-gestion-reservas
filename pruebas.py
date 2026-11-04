@@ -2,11 +2,12 @@ from cliente import Cliente
 from excepciones import DatoInvalidoError, ReservaInvalidaError, OperacionNoPermitidaError
 from reserva import Reserva
 from datetime import timedelta, datetime
-
+from servicio import ReservaSala
 
 # Calculamos una fecha futura para que la prueba siga siendo válida.
 fecha_futura = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
 
+servicio_prueba=ReservaSala(nombre="Sala de reuniones", tarifa_base=100 )
 
 # Prueba 1: crear un cliente con datos válidos.
 try:
@@ -19,7 +20,7 @@ except DatoInvalidoError as error:
 else:
     # Prueba 2: intentar crear una reserva con una fecha pasada.
     try:
-        reserva_pasada = Reserva(objeto_nuevo, "Servicio de prueba", "2024-01-01", "10:00")
+        reserva_pasada = Reserva(objeto_nuevo, servicio_prueba, "2024-01-01", "10:00")
         print("Fallo: se permitió crear una reserva con fecha pasada.")
 
     except ReservaInvalidaError as error:
@@ -27,7 +28,7 @@ else:
 
     # Prueba 3: crear una reserva con una fecha futura.
     try:
-        reserva_nueva = Reserva(objeto_nuevo, "Servicio de prueba", fecha_futura, "10:00")
+        reserva_nueva = Reserva(objeto_nuevo,servicio_prueba, fecha_futura, "10:00")
         print("Prueba exitosa: la reserva se creó correctamente.")
 
     except ReservaInvalidaError as error:
