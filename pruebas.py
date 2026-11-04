@@ -9,6 +9,16 @@ fecha_futura = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
 
 servicio_prueba=ReservaSala(nombre="Sala de reuniones", tarifa_base=100 )
 
+# Comprobamos que un servicio válido permita calcular su costo.
+print(f"Servicio válido: {servicio_prueba.nombre}, costo: {servicio_prueba.calcular_costo()}")
+
+# Intentamos crear un servicio inválido y continuamos con las demás pruebas.
+try:
+    ReservaSala("Sala inválida", -1)
+    print("Fallo: se aceptó una tarifa negativa.")
+except DatoInvalidoError as error:
+    print(f"Prueba exitosa: se rechazó el servicio inválido. {error}")
+
 # Prueba 1: crear un cliente con datos válidos.
 try:
     objeto_nuevo = Cliente("Consumidor final", "cc", "2222222222")

@@ -77,9 +77,10 @@ personalizadas y registro de eventos.
 - Registro y consulta de varias reservas durante una misma ejecución.
 - Consulta de reservas por código o número de posición.
 
-La disponibilidad general del servicio es una condición propia del servicio.
-El sistema todavía no valida la disponibilidad de un horario específico ni los
-cruces entre reservas.
+La disponibilidad general pertenece al servicio. Para salas corporativas, el
+sistema también rechaza cruces con reservas pendientes o confirmadas durante la
+misma ejecución. Una reserva cancelada libera el horario. La sala se identifica
+por nombre; los cruces de combos y asesorías no están implementados.
 
 ### Registro de eventos
 
@@ -92,7 +93,7 @@ cruces entre reservas.
 - Pruebas manuales mediante `pruebas.py`.
 - Pruebas automatizadas con `unittest` para servicios, reservas, catálogo y menú
   principal.
-- En la revisión de esta versión se ejecutaron satisfactoriamente 109 pruebas
+- En la revisión de esta versión se ejecutaron satisfactoriamente 116 pruebas
   automatizadas. Esta cifra corresponde a ese cierre y puede variar si se
   agregan nuevas pruebas.
 
@@ -173,6 +174,12 @@ El menú principal ofrece las siguientes opciones:
 
 ## Ejecución de las pruebas manuales
 
+Para ejecutar las 12 operaciones de la simulación y registrar sus eventos:
+
+```bash
+python simulacion_operaciones.py
+```
+
 Desde la carpeta raíz del proyecto:
 
 ```bash
@@ -221,10 +228,8 @@ python -m unittest discover -s pruebas -v
 
 ## Aspectos pendientes y posibles mejoras
 
-- **Validación de cruces de horarios:** impedir que se registren o confirmen
-  reservas superpuestas para el mismo recurso, permitir reservas consecutivas y
-  liberar el horario cuando una reserva se cancela. Actualmente no está
-  implementada.
+- **Validación de cruces de horarios:** ampliar la validación de salas a otros
+  recursos si el equipo lo acuerda y definir identificadores estables.
 - **Fidelización de clientes:** estudiar la implementación de categorías
   Silver, Gold y Platinum, con beneficios o descuentos según el historial de
   reservas. Los niveles y porcentajes deben quedar sujetos a la revisión y

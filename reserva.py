@@ -6,6 +6,9 @@ from cliente import Cliente
 from excepciones import DatoInvalidoError, OperacionNoPermitidaError, ReservaInvalidaError
 from servicio import Servicio
 
+# Señalamos los datos que no se incluyeron al crear una reserva.
+_FALTANTE = object()
+
 
 class Reserva:
     """Relaciona un cliente con un servicio en una fecha y hora determinadas."""
@@ -15,7 +18,9 @@ class Reserva:
     ESTADO_CANCELADA = "cancelada"
     contador = 0
 
-    def __init__(self, cliente, servicio, fecha, hora):
+    def __init__(self, cliente=_FALTANTE, servicio=_FALTANTE, fecha=_FALTANTE, hora=_FALTANTE):
+        if any(dato is _FALTANTE for dato in (cliente, servicio, fecha, hora)):
+            raise ReservaInvalidaError("La reserva necesita cliente, servicio, fecha y hora.")
         if not isinstance(cliente, Cliente):
             raise DatoInvalidoError("El cliente debe ser una instancia de Cliente.")
         if not isinstance(servicio, Servicio):

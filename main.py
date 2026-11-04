@@ -445,6 +445,9 @@ def main():
         ) as error:
             print(f"Error: {error}")
             logging.error("Error controlado durante la ejecución: %s", error)
+        finally:
+            # Dejamos un registro aunque una operación termine con error.
+            logging.info("Finalizó el procesamiento de la opción del menú.")
 
 
 if __name__ == "__main__":
