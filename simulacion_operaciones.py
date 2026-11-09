@@ -3,8 +3,8 @@
 import logging
 import math
 from datetime import date, timedelta
-
-import configuracion_logs  # Configuramos el archivo de eventos.
+# Configuramos el archivo de eventos.
+import configuracion_logs  
 from cliente import Cliente
 from excepciones import DatoInvalidoError, OperacionNoPermitidaError, ReservaInvalidaError, ServicioNoDisponibleError
 from reserva import Reserva
