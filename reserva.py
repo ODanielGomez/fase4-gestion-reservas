@@ -3,6 +3,7 @@
 from datetime import date, datetime, timedelta
 
 from cliente import Cliente
+from entidad import Entidad
 from excepciones import DatoInvalidoError, OperacionNoPermitidaError, ReservaInvalidaError
 from servicio import Servicio
 
@@ -10,7 +11,7 @@ from servicio import Servicio
 _FALTANTE = object()
 
 
-class Reserva:
+class Reserva(Entidad):
     """Relaciona un cliente con un servicio en una fecha y hora determinadas."""
 
     ESTADO_PENDIENTE = "pendiente"
@@ -95,3 +96,11 @@ class Reserva:
         if self.duracion is None:
             return None
         return self.fecha_hora_inicio + timedelta(hours=self.duracion)
+
+    def describir(self):
+        """Devuelve una descripción legible de la reserva."""
+        return (
+            f"Reserva {self.codigo_reserva} de {self.cliente.nombre} "
+            f"para {self.servicio.nombre} el {self.fecha} a las {self.hora} "
+            f"({self.estado})."
+        )

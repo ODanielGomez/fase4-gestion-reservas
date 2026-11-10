@@ -3,13 +3,14 @@
 from abc import ABC, abstractmethod
 import math
 
+from entidad import Entidad
 from excepciones import DatoInvalidoError, ServicioNoDisponibleError
 
 # Identificamos los parámetros obligatorios que no fueron enviados.
 _FALTANTE = object()
 
 
-class Servicio(ABC):
+class Servicio(Entidad, ABC):
     """Clase base para todos los servicios de Software FJ."""
 
     def __init__(self, nombre=_FALTANTE, tarifa_base=_FALTANTE, impuesto=0, descuento=0, disponible=True):
@@ -75,6 +76,15 @@ class Servicio(ABC):
         """Cada servicio define cómo se calcula su valor sin impuestos ni descuentos."""
         pass
 
+    @abstractmethod
+    def describir_servicio(self):
+        """Cada servicio describe sus propias características."""
+        pass
+
+    def describir(self):
+        """Implementa la descripción general de la entidad servicio."""
+        return self.describir_servicio()
+
     def calcular_impuesto(self):
         """Calcula el impuesto sobre el costo base."""
         return self.calcular_costo_base() * self.impuesto / 100
@@ -83,15 +93,28 @@ class Servicio(ABC):
         """Calcula el descuento sobre el costo base."""
         return self.calcular_costo_base() * self.descuento / 100
 
-    def calcular_costo(self):
-        """Devuelve el costo final con impuesto y descuento aplicados."""
+    def calcular_costo(self, impuesto=None, descuento=None):
+        """Devuelve el costo final con impuesto y descuento aplicados.
+
+        Los parámetros opcionales permiten calcular variantes del costo sin
+        modificar los valores configurados en el servicio.
+        """
+        # Si no se envían valores, se usan los registrados en el servicio.
+        porcentaje_impuesto = (
+            self.impuesto if impuesto is None
+            else self._validar_porcentaje(impuesto, "impuesto")
+        )
+        porcentaje_descuento = (
+            self.descuento if descuento is None
+            else self._validar_porcentaje(descuento, "descuento")
+        )
         try:
             # Validamos el resultado de cada cálculo antes de entregar el total.
             base = self.calcular_costo_base()
             if not math.isfinite(base):
                 raise DatoInvalidoError("El costo base no es un número finito.")
-            impuesto = base * (self.impuesto / 100)
-            descuento = base * (self.descuento / 100)
+            impuesto = base * (porcentaje_impuesto / 100)
+            descuento = base * (porcentaje_descuento / 100)
             total = base + impuesto - descuento
             if not math.isfinite(total):
                 raise DatoInvalidoError("El costo final no es un número finito.")
@@ -280,3 +303,11 @@ class ComboEquipos(Servicio):
     def calcular_costo_base(self):
         """El costo del combo es fijo y no se multiplica por sus equipos."""
         return self.tarifa_base
+
+    def describir_servicio(self):
+        # Mostramos los equipos incluidos y la jornada del combo.
+        equipos = ", ".join(
+            f"{cantidad} x {nombre}"
+            for nombre, cantidad in self.__componentes.items()
+        )
+        return f"Combo {self.nombre} ({equipos}): jornada de {self.JORNADA_HORAS} horas."

@@ -17,6 +17,7 @@ orientada a objetos:
 - Herencia.
 - Encapsulamiento.
 - Polimorfismo.
+- Sobrecarga simulada mediante parámetros opcionales.
 
 ## Objetivo del sistema
 
@@ -33,6 +34,12 @@ personalizadas y registro de eventos.
 - [Integrante 5]
 
 ## Funcionalidades implementadas
+
+### Entidad abstracta general
+
+- Clase abstracta `Entidad` con el método `describir()`.
+- `Cliente`, `Servicio` y `Reserva` heredan de `Entidad` e implementan su
+  descripción.
 
 ### Gestión de clientes
 
@@ -62,6 +69,14 @@ personalizadas y registro de eventos.
   - Infraestructura tecnológica y seguridad informática.
   - Transformación digital y automatización.
 - Tarifa fija por sesión para las asesorías.
+
+### Cálculo de costos
+
+- Método `calcular_costo()` sobrescrito a través de `calcular_costo_base()` en
+  cada servicio.
+- Variantes sobrecargadas del costo mediante parámetros opcionales:
+  `calcular_costo(impuesto=...)` y `calcular_costo(descuento=...)`, sin
+  modificar los valores configurados en el servicio.
 
 ### Gestión de reservas
 
@@ -93,7 +108,7 @@ por nombre; los cruces de combos y asesorías no están implementados.
 - Pruebas manuales mediante `pruebas.py`.
 - Pruebas automatizadas con `unittest` para servicios, reservas, catálogo y menú
   principal.
-- En la revisión de esta versión se ejecutaron satisfactoriamente 116 pruebas
+- En la revisión de esta versión se ejecutaron satisfactoriamente 127 pruebas
   automatizadas. Esta cifra corresponde a ese cierre y puede variar si se
   agregan nuevas pruebas.
 
@@ -121,6 +136,7 @@ fase4-gestion-reservas/
 ├── .gitignore
 ├── README.md
 ├── main.py                         Punto de entrada y menú principal
+├── entidad.py                      Clase abstracta general del sistema
 ├── cliente.py                      Clase Cliente y sus validaciones
 ├── servicio.py                     Clases de servicios y cálculo de costos
 ├── catalogo_servicios.py           Catálogo de salas, combos y asesorías
@@ -133,7 +149,10 @@ fase4-gestion-reservas/
 │   ├── test_servicios.py           Pruebas de los servicios
 │   ├── test_reserva.py             Pruebas de la clase Reserva
 │   ├── test_catalogo_servicios.py  Pruebas del catálogo
-│   └── test_main.py                Pruebas del menú principal
+│   ├── test_main.py                Pruebas del menú principal
+│   ├── test_configuracion_logs.py  Pruebas de la ruta y creación de logs
+│   ├── test_entidad_y_sobrecarga.py Pruebas de Entidad y sobrecarga
+│   └── test_validaciones_adicionales.py Pruebas de validaciones extra
 └── logs/
     ├── README.md                   Descripción de la carpeta de logs
     └── eventos.log                 Archivo generado durante la ejecución
@@ -147,8 +166,8 @@ automáticamente. El archivo de log está excluido en `.gitignore`.
 - Tener Python instalado.
 - El proyecto se ha ejecutado y probado con Python 3.14.3.
 - No se requiere instalar paquetes externos mediante `pip`.
-- Ejecutar los comandos desde la carpeta raíz del proyecto, debido a las rutas
-  relativas utilizadas para el registro de eventos.
+- El programa puede ejecutarse desde cualquier directorio: la ruta de
+  `logs/eventos.log` se calcula a partir de la ubicación del proyecto.
 
 Para consultar la versión instalada de Python:
 
@@ -227,6 +246,9 @@ python -m unittest discover -s pruebas -v
 ```
 
 ## Aspectos pendientes y posibles mejoras
+
+Los siguientes puntos son mejoras opcionales. El enunciado de la actividad no
+exige de forma explícita la fidelización, el NIT ni el cobro de impuestos.
 
 - **Validación de cruces de horarios:** ampliar la validación de salas a otros
   recursos si el equipo lo acuerda y definir identificadores estables.

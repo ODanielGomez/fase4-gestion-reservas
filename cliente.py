@@ -1,12 +1,13 @@
 
 # Importamos la excepción que usaremos cuando los datos del cliente no sean válidos.
+from entidad import Entidad
 from excepciones import DatoInvalidoError
 
 # Usamos un valor especial para identificar datos que no se enviaron.
 _FALTANTE = object()
 
 # Creamos la clase Cliente para almacenar y validar la información básica de cada cliente.
-class Cliente:
+class Cliente(Entidad):
     def __init__(self, nombre=_FALTANTE, tipo_identificacion=_FALTANTE, numero_identificacion=_FALTANTE):
         # Informamos los parámetros faltantes con un error propio del sistema.
         if any(dato is _FALTANTE for dato in (nombre, tipo_identificacion, numero_identificacion)):
@@ -56,3 +57,10 @@ class Cliente:
         if not isinstance(valor, str) or not valor.strip():
             raise DatoInvalidoError("El tipo de identificación del cliente no puede estar vacío.")
         self.__tipo_identificacion = valor.strip()
+
+    def describir(self):
+        """Devuelve una descripción legible del cliente."""
+        return (
+            f"Cliente: {self.nombre} "
+            f"({self.tipo_identificacion} {self.__numero_identificacion})"
+        )
