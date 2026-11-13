@@ -16,11 +16,12 @@ class Servicio(Entidad, ABC):
     def __init__(self, nombre=_FALTANTE, tarifa_base=_FALTANTE, impuesto=0, descuento=0, disponible=True):
         if nombre is _FALTANTE or tarifa_base is _FALTANTE:
             raise DatoInvalidoError("El servicio necesita un nombre y una tarifa base.")
-        self.__nombre = self._validar_nombre(nombre)
-        self.__tarifa_base = self._validar_tarifa(tarifa_base)
-        self.__impuesto = self._validar_porcentaje(impuesto, "impuesto")
-        self.__descuento = self._validar_porcentaje(descuento, "descuento")
-        self.__disponible = self._validar_disponible(disponible)
+        self.__nombre = nombre
+        self.__tarifa_base = tarifa_base
+        self.__impuesto = impuesto
+        self.__descuento = descuento
+        self.__disponible = disponible
+        self.validar_parametros()
 
     # Propiedades de solo lectura para consultar los datos del servicio.
     @property
@@ -42,6 +43,11 @@ class Servicio(Entidad, ABC):
     @property
     def disponible(self):
         return self.__disponible
+
+    @property
+    def duracion(self):
+        """Duración en horas del servicio, si el servicio la define."""
+        return None
 
     @staticmethod
     def _validar_nombre(nombre):
@@ -70,6 +76,16 @@ class Servicio(Entidad, ABC):
         if not isinstance(disponible, bool):
             raise DatoInvalidoError("La disponibilidad debe ser verdadera o falsa.")
         return disponible
+
+    @abstractmethod
+    def validar_parametros(self):
+        """Valida los parámetros comunes y los específicos de cada servicio."""
+        self.__nombre = self._validar_nombre(self.__nombre)
+        self.__tarifa_base = self._validar_tarifa(self.__tarifa_base)
+        self.__impuesto = self._validar_porcentaje(self.__impuesto, "impuesto")
+        self.__descuento = self._validar_porcentaje(self.__descuento, "descuento")
+        self.__disponible = self._validar_disponible(self.__disponible)
+        return True
 
     @abstractmethod
     def calcular_costo_base(self):
@@ -141,12 +157,21 @@ class ReservaSala(Servicio):
     """Servicio para reservar una sala por horas."""
 
     def __init__(self, nombre=_FALTANTE, tarifa_base=_FALTANTE, horas=1, impuesto=0, descuento=0, disponible=True):
+        self.__horas = horas
         super().__init__(nombre, tarifa_base, impuesto, descuento, disponible)
-        self.__horas = self._validar_horas(horas)
 
     @property
     def horas(self):
         return self.__horas
+
+    @property
+    def duracion(self):
+        return self.horas
+
+    def validar_parametros(self):
+        super().validar_parametros()
+        self.__horas = self._validar_horas(self.__horas)
+        return True
 
     @staticmethod
     def _validar_horas(horas):
@@ -168,12 +193,17 @@ class AlquilerEquipo(Servicio):
     """Servicio para alquilar equipos por cantidad de unidades."""
 
     def __init__(self, nombre=_FALTANTE, tarifa_base=_FALTANTE, cantidad=1, impuesto=0, descuento=0, disponible=True):
+        self.__cantidad = cantidad
         super().__init__(nombre, tarifa_base, impuesto, descuento, disponible)
-        self.__cantidad = self._validar_cantidad(cantidad)
 
     @property
     def cantidad(self):
         return self.__cantidad
+
+    def validar_parametros(self):
+        super().validar_parametros()
+        self.__cantidad = self._validar_cantidad(self.__cantidad)
+        return True
 
     @staticmethod
     def _validar_cantidad(cantidad):
@@ -193,6 +223,10 @@ class AlquilerEquipo(Servicio):
 
 class AsesoriaEspecializada(Servicio):
     """Servicio de asesoría con un valor fijo por sesión."""
+
+    def validar_parametros(self):
+        super().validar_parametros()
+        return True
 
     def calcular_costo_base(self):
         return self.tarifa_base
@@ -216,8 +250,8 @@ class SalaCorporativa(ReservaSala):
         descuento=0,
         disponible=True,
     ):
-        self.__capacidad = self._validar_capacidad(capacidad)
-        self.__descripcion = self._validar_descripcion(descripcion)
+        self.__capacidad = capacidad
+        self.__descripcion = descripcion
         super().__init__(nombre, tarifa_base, horas, impuesto, descuento, disponible)
 
     @property
@@ -227,6 +261,12 @@ class SalaCorporativa(ReservaSala):
     @property
     def descripcion(self):
         return self.__descripcion
+
+    def validar_parametros(self):
+        self.__capacidad = self._validar_capacidad(self.__capacidad)
+        self.__descripcion = self._validar_descripcion(self.__descripcion)
+        super().validar_parametros()
+        return True
 
     @staticmethod
     def _validar_capacidad(capacidad):
@@ -261,8 +301,8 @@ class ComboEquipos(Servicio):
         descuento=0,
         disponible=True,
     ):
+        self.__componentes = componentes
         super().__init__(nombre, tarifa_base, impuesto, descuento, disponible)
-        self.__componentes = self._validar_componentes(componentes)
 
     @property
     def componentes(self):
@@ -277,6 +317,15 @@ class ComboEquipos(Servicio):
     def horas(self):
         """Permite consultar la jornada desde la reserva."""
         return self.JORNADA_HORAS
+
+    @property
+    def duracion(self):
+        return self.JORNADA_HORAS
+
+    def validar_parametros(self):
+        super().validar_parametros()
+        self.__componentes = self._validar_componentes(self.__componentes)
+        return True
 
     @staticmethod
     def _validar_componentes(componentes):

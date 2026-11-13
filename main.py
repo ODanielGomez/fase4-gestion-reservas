@@ -187,8 +187,7 @@ def gestionar_reserva(reserva):
 
         if opcion == "1":
             try:
-                print(reserva.confirmar_reserva())
-                logging.info("Reserva %s confirmada.", reserva.codigo_reserva)
+                print(reserva.procesar_reserva())
                 return
             except (OperacionNoPermitidaError, ServicioNoDisponibleError) as error:
                 print(f"No se pudo confirmar la reserva: {error}")

@@ -1,10 +1,17 @@
 """Gestión de reservas de Software FJ."""
 
+import logging
+import math
 from datetime import date, datetime, timedelta
 
 from cliente import Cliente
 from entidad import Entidad
-from excepciones import DatoInvalidoError, OperacionNoPermitidaError, ReservaInvalidaError
+from excepciones import (
+    DatoInvalidoError,
+    OperacionNoPermitidaError,
+    ReservaInvalidaError,
+    ServicioNoDisponibleError,
+)
 from servicio import Servicio
 
 # Señalamos los datos que no se incluyeron al crear una reserva.
@@ -55,6 +62,7 @@ class Reserva(Entidad):
         servicio.validar_disponibilidad()
         self.cliente = cliente
         self.servicio = servicio
+        self._duracion = self._validar_duracion(servicio.duracion)
         self.fecha = fecha
         self.hora = hora
         self.fecha_hora_inicio = fecha_hora_reserva
@@ -62,13 +70,26 @@ class Reserva(Entidad):
         Reserva.contador += 1
         self.codigo_reserva = f"RES-{Reserva.contador:03d}"
 
+    @staticmethod
+    def _validar_duracion(duracion):
+        """Valida la duración en horas que aporta el servicio."""
+        if duracion is None:
+            return None
+        if isinstance(duracion, bool) or not isinstance(duracion, (int, float)):
+            raise ReservaInvalidaError("La duración del servicio debe ser un número.")
+        if not math.isfinite(duracion) or duracion <= 0:
+            raise ReservaInvalidaError(
+                "La duración del servicio debe ser mayor que cero."
+            )
+        return duracion
+
     @property
     def esta_confirmada(self):
         return self.estado == self.ESTADO_CONFIRMADA
 
     @property
     def duracion(self):
-        return getattr(self.servicio, "horas", None)
+        return self._duracion
 
     @property
     def cantidad(self):
@@ -90,6 +111,29 @@ class Reserva(Entidad):
             raise OperacionNoPermitidaError("Solo se pueden cancelar reservas pendientes y confirmadas.")
         self.estado = self.ESTADO_CANCELADA
         return f"Reserva {self.codigo_reserva} cancelada el {self.fecha} a las {self.hora}."
+
+    def procesar_reserva(self):
+        """Procesa una reserva pendiente confirmándola y registrando el resultado."""
+        try:
+            resultado = self.confirmar_reserva()
+        except (OperacionNoPermitidaError, ServicioNoDisponibleError) as error:
+            logging.error(
+                "Error al procesar la reserva %s: %s",
+                self.codigo_reserva,
+                error,
+            )
+            raise
+        else:
+            logging.info(
+                "Reserva %s procesada correctamente.",
+                self.codigo_reserva,
+            )
+            return resultado
+        finally:
+            logging.info(
+                "Finalizó el procesamiento de la reserva %s.",
+                self.codigo_reserva,
+            )
 
     def obtener_fecha_hora_final(self):
         """Calcula el final cuando el servicio proporciona una duración en horas."""
